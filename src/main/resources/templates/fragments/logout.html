@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopWear - Log Out</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/static/styles.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+<!-- Header -->
+<header class="header py-4 px-6 flex items-center justify-between">
+    <div class="flex items-center">
+        <h1 class="text-2xl font-bold">ShopWear</h1>
+    </div>
+</header>
+
+<!-- Logout Confirmation Section -->
+<main class="py-12 px-6">
+    <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
+        <h1 class="text-3xl font-bold text-teal-600 mb-4">Log Out</h1>
+        <p class="text-lg text-gray-600 mb-6">
+            Are you sure you want to log out,
+            <span th:text="${#authentication.name != null} ? ${#authentication.name} : 'User'" class="text-coral">User</span>?
+        </p>
+
+        <form th:action="@{/logout}" method="post" class="mb-4">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <button type="submit" class="btn-primary w-full inline-flex items-center justify-center">
+                <i class="fas fa-sign-out-alt mr-2"></i>Log Out
+            </button>
+        </form>
+
+        <a th:href="@{/user/dashboard}" class="btn-secondary inline-flex items-center">
+            <i class="fas fa-arrow-left mr-2"></i>Cancel
+        </a>
+    </div>
+</main>
+
+<!-- Footer -->
+<div th:replace="~{fragments :: footer}"></div>
+
+<!-- Scripts -->
+<script th:src="@{/static/scripts.js}"></script>
+</body>
+</html>

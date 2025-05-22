@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <title>NOVA - Register</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon" th:href="@{/image/${logoImage.id}}">
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/image/${faviconImage.id}}">
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.0.0/css/all.min.css}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .register-card {
+      background: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      padding: 2.5rem;
+      max-width: 500px;
+      width: 100%;
+      transition: transform 0.3s ease;
+    }
+    .register-card:hover {
+      transform: translateY(-5px);
+    }
+    .register-card h1 {
+      color: #00695c;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .form-label {
+      color: #004d40;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    .form-control, .form-select {
+      border: 2px solid #b0bec5;
+      border-radius: 8px;
+      padding: 0.75rem;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #00695c;
+      box-shadow: 0 0 8px rgba(0, 105, 92, 0.2);
+      outline: none;
+    }
+    .btn-success {
+      background-color: #00796b;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      font-weight: 500;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    .btn-success:hover {
+      background-color: #004d40;
+      transform: scale(1.05);
+    }
+    .btn-link {
+      color: #00796b;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .btn-link:hover {
+      color: #004d40;
+      text-decoration: underline;
+    }
+    .progress {
+      height: 6px;
+      border-radius: 3px;
+      background-color: #eceff1;
+      margin-top: 0.5rem;
+    }
+    .progress-bar {
+      transition: width 0.3s ease;
+    }
+    .alert {
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+    }
+    .invalid-feedback, .text-danger {
+      font-size: 0.875rem;
+      color: #d32f2f;
+    }
+    .is-valid {
+      border-color: #2e7d32 !important;
+    }
+    .is-invalid {
+      border-color: #d32f2f !important;
+    }
+    @media (max-width: 576px) {
+      .register-card {
+        padding: 1.5rem;
+      }
+      .register-card h1 {
+        font-size: 1.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div th:replace="~{fragments :: topNav}"></div>
+<div class="container">
+  <div class="register-card">
+    <h1>Register with NOVA</h1>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <form th:action="@{/user/register}" th:object="${user}" method="post" id="registerForm" class="needs-validation" novalidate>
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+      <input type="hidden" name="adminCode" value="NOVA_ADMIN_2025"/>
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" class="form-control" id="username" th:field="*{username}" required>
+        <div th:errors="*{username}" class="text-danger"></div>
+        <div id="usernameFeedback" class="invalid-feedback"></div>
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" th:field="*{email}" required>
+        <div th:errors="*{email}" class="text-danger"></div>
+        <div id="emailFeedback" class="invalid-feedback"></div>
+      </div>
+      <div class="mb-3">
+        <label for="fullName" class="form-label">Full Name</label>
+        <input type="text" class="form-control" id="fullName" th:field="*{fullName}" required>
+        <div th:errors="*{fullName}" class="text-danger"></div>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" class="form-control" id="password" th:field="*{password}" required>
+        <div th:errors="*{password}" class="text-danger"></div>
+        <div id="passwordFeedback" class="invalid-feedback"></div>
+        <div class="progress">
+          <div id="passwordStrength" class="progress-bar" role="progressbar" style="width: 0%;"></div>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="confirmPassword" class="form-label">Confirm Password</label>
+        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+        <div id="confirmPasswordFeedback" class="invalid-feedback"></div>
+      </div>
+      <div class="mb-3">
+        <label for="role" class="form-label">Role</label>
+        <select class="form-select" id="role" th:field="*{role}" required>
+          <option value="ROLE_USER">User</option>
+          <option value="ROLE_ADMIN">Admin</option>
+        </select>
+        <div th:errors="*{role}" class="text-danger"></div>
+      </div>
+      <div class="d-grid gap-2 mb-3">
+        <button type="submit" class="btn btn-success">Register</button>
+      </div>
+      <div class="text-center">
+        <a th:href="@{/login}" class="btn btn-link">Already have an account? Log in</a>
+      </div>
+    </form>
+  </div>
+</div>
+<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/static/js/templatemo.js}"></script>
+<script th:src="@{/static/js/register.js}"></script>
+<script src="https://www.google.com/recaptcha/api.js?render=6LfK2zAUAAAAAI8K8kF1q3qW5e8y9z1z2q3x4y5z"></script>
+</body>
+</html>

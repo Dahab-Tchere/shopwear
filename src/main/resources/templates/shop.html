@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>NOVA - Premium eCommerce Shop</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" th:if="${faviconImage != null}" th:href="@{/image/{id}(id=${faviconImage.id})}">
+    <link rel="shortcut icon" type="image/x-icon" th:unless="${faviconImage != null}" href="/static/img/favicon.ico">
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/6.0.0/css/all.min.css}">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap">
+    <style>
+        :root {
+            --primary-color: #4A00E0; /* Deep indigo */
+            --secondary-color: #8E2DE2; /* Vibrant purple */
+            --text-color: #FFFFFF; /* White text */
+            --background-color: #F0F2F5; /* Light gray background */
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --accent-color: #FF6B6B;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-color);
+            margin: 0;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            background-size: 200% 200%;
+            animation: gradientAnimation 10s ease infinite;
+            min-height: 100vh;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Header with Sidebar Toggle */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background: var(--secondary-color);
+            padding: 2rem;
+            transition: left 0.3s ease;
+            z-index: 1001;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar .nav-link {
+            color: var(--text-color);
+            font-size: 1.1rem;
+            padding: 0.75rem 0;
+            display: block;
+            transition: color 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover {
+            color: #FFFFFF;
+            text-decoration: underline;
+        }
+
+        .sidebar .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+        }
+
+        /* Overlay for Sidebar */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1000;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            padding: 2rem 0;
+        }
+
+        .product-card {
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            border: none;
+            overflow: hidden;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .product-card img {
+            height: 280px;
+            object-fit: cover;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .product-card .card-body {
+            padding: 2rem;
+            color: #333;
+        }
+
+        .product-card .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .product-card .price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .product-overlay {
+            background: rgba(74, 0, 224, 0.9);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .product-card:hover .product-overlay {
+            opacity: 1;
+        }
+
+        .category-sidebar {
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .category-sidebar h2 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .category-sidebar a {
+            color: #333;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .category-sidebar a:hover {
+            color: var(--primary-color);
+            padding-left: 1rem;
+        }
+
+        .btn-nova {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            font-weight: 500;
+            color: white;
+        }
+
+        .btn-nova:hover {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .pagination .page-link {
+            border-radius: 10px;
+            margin: 0 5px;
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+            background: var(--card-bg);
+            border: 1px solid var(--primary-color);
+        }
+
+        .pagination .page-link:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .pagination .active .page-link {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .shop-header {
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .shop-top-menu a {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-right: 1rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            color: #333;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .shop-top-menu a:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .shop-top-menu a.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid rgba(74, 0, 224, 0.3);
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(74, 0, 224, 0.25);
+        }
+
+        .brand-img {
+            height: 80px;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+            filter: brightness(1.2);
+        }
+
+        .brand-img:hover {
+            transform: scale(1.1);
+        }
+
+        .brands-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin: 3rem 0;
+            padding: 3rem 0;
+        }
+
+        .brands-section h1 {
+            color: var(--text-color);
+            font-weight: 700;
+        }
+
+        .brands-section p {
+            color: var(--text-color);
+            opacity: 0.9;
+        }
+
+        .carousel-control-prev, .carousel-control-next {
+            width: 5%;
+            background: none;
+        }
+
+        .carousel-control-prev i, .carousel-control-next i {
+            font-size: 2rem;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+
+        .carousel-control-prev:hover i, .carousel-control-next:hover i {
+            color: var(--accent-color);
+        }
+
+        .container {
+            max-width: 1400px;
+        }
+
+        /* Rating Stars */
+        .rating-stars {
+            color: #FFD700;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--secondary-color);
+            padding: 2rem 0;
+            text-align: center;
+            color: #FFFFFF;
+            margin-top: 3rem;
+        }
+
+        footer a {
+            color: #FFFFFF;
+            text-decoration: none;
+            margin: 0 0.5rem;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<!-- Header with Sidebar Toggle -->
+<header>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+</header>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <button class="close-btn" onclick="toggleSidebar()">
+        <i class="fas fa-times"></i>
+    </button>
+    <nav>
+        <a class="nav-link" th:href="@{/}">Home</a>
+        <a class="nav-link" th:href="@{/shop}">Shop</a>
+<!--        <a class="nav-link" th:href="@{/shop/categories}">Categories</a>-->
+        <a class="nav-link" th:href="@{/shop}">Products</a>
+        <a class="nav-link" th:href="@{/about}">About</a>
+<!--        <a class="nav-link" th:href="@{/contact}">Contact</a>-->
+        <a sec:authorize="isAuthenticated()" class="nav-link" th:href="@{/cart}">Cart</a>
+        <a sec:authorize="isAuthenticated()" class="nav-link" th:href="@{/logout}">Logout</a>
+        <a sec:authorize="!isAuthenticated()" class="nav-link" th:href="@{/login}">Login</a>
+    </nav>
+</div>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="main-content">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="category-sidebar">
+                    <h2 class="mb-4">Categories</h2>
+                    <div>
+                        <a th:href="@{/shop}">All Categories</a>
+                        <a th:each="category : ${categories}" th:href="@{/shop(categoryId=${category.id})}" th:text="${category.name}">Category</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="shop-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="shop-top-menu">
+                                <a th:class="${categoryId == null} ? 'active'" th:href="@{/shop}">All</a>
+                                <span th:each="category : ${categories}">
+                                    <a th:class="${category.id == categoryId} ? 'active'" th:href="@{/shop(categoryId=${category.id})}" th:text="${category.name}"></a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-end">
+                                <select class="form-control" style="max-width: 200px;" onchange="window.location.href = this.value;">
+                                    <option th:value="@{/shop(sort='featured',categoryId=${categoryId},q=${q})}" th:selected="${sort == 'featured'}">Featured</option>
+                                    <option th:value="@{/shop(sort='az',categoryId=${categoryId},q=${q})}" th:selected="${sort == 'az'}">A to Z</option>
+                                    <option th:value="@{/shop(sort='item',categoryId=${categoryId},q=${q})}" th:selected="${sort == 'item'}">Item</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-4" th:each="product : ${products}">
+                        <div class="card product-card">
+                            <div class="position-relative">
+                                <img class="card-img-top" th:if="${product.imageId != null}" th:src="@{/image/{id}(id=${product.imageId})}" th:alt="${product.name}">
+                                <img class="card-img-top" th:unless="${product.imageId != null}" th:src="@{/static/images/default_product.jpg}" th:alt="${product.name}">
+                                <div class="card-img-overlay product-overlay d-flex align-items-center justify-content-center">
+                                    <div class="text-center">
+                                        <div class="mb-3" sec:authorize="isAuthenticated()">
+                                            <a class="btn btn-nova me-2" th:href="@{/shop/product/{id}/bookmark(id=${product.id})}"><i class="far fa-heart"></i></a>
+                                        </div>
+                                        <div class="mb-3" sec:authorize="!isAuthenticated()">
+                                            <a class="btn btn-nova me-2" th:href="@{/login}"><i class="far fa-heart"></i></a>
+                                        </div>
+                                        <div class="mb-3">
+                                            <a class="btn btn-nova me-2" th:href="@{/shop/product/{id}(id=${product.id})}"><i class="far fa-eye"></i></a>
+                                        </div>
+                                        <div sec:authorize="isAuthenticated()">
+                                            <form th:action="@{/cart/add}" method="post" class="d-inline">
+                                                <input type="hidden" name="productId" th:value="${product.id}">
+                                                <input type="hidden" name="quantity" value="1">
+                                                <button type="submit" class="btn btn-nova"><i class="fas fa-cart-plus"></i></button>
+                                            </form>
+                                        </div>
+                                        <div sec:authorize="!isAuthenticated()">
+                                            <a class="btn btn-nova" th:href="@{/login}"><i class="fas fa-cart-plus"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <a th:href="@{/shop/product/{id}(id=${product.id})}" class="card-title text-decoration-none" th:text="${product.name}">Product Name</a>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <small class="text-muted" th:if="${product.category != null}" th:text="${product.category}">Category</small>
+                                    <small class="text-muted" th:unless="${product.category != null}">N/A</small>
+                                    <div class="rating-stars">
+                                        <i th:each="star : ${#numbers.sequence(1, 5)}" th:class="${star} <= ${product.rating} ? 'fas fa-star' : 'far fa-star'"></i>
+                                    </div>
+                                </div>
+                                <p class="price text-center mb-0" th:text="'$' + ${product.price}">$250.00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination pagination-lg justify-content-center">
+                                <li class="page-item" th:class="${currentPage == 1} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/shop(page=${currentPage - 1},categoryId=${categoryId},sort=${sort},q=${q})}" tabindex="-1">Previous</a>
+                                </li>
+                                <li class="page-item" th:each="page : ${#numbers.sequence(1, totalPages)}" th:class="${page == currentPage} ? 'active'">
+                                    <a class="page-link" th:href="@{/shop(page=${page},categoryId=${categoryId},sort=${sort},q=${q})}" th:text="${page}">1</a>
+                                </li>
+                                <li class="page-item" th:class="${currentPage == totalPages} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/shop(page=${currentPage + 1},categoryId=${categoryId},sort=${sort},q=${q})}">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="brands-section">
+    <div class="container my-4">
+        <div class="row text-center py-3">
+            <div class="col-lg-6 m-auto">
+                <h1 class="h1">Our Brands</h1>
+                <p>Discover premium brands that define quality and innovation.</p>
+            </div>
+            <div class="col-lg-9 m-auto tempaltemo-carousel">
+                <div class="row d-flex flex-row">
+                    <div class="col-1 align-self-center">
+                        <a class="h1" href="#multi-item-example" role="button" data-bs-slide="prev">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </div>
+                    <div class="col">
+                        <div class="carousel slide carousel-multi-item pt-2 pt-md-0" id="multi-item-example" data-bs-ride="carousel">
+                            <div class="carousel-inner product-links-wap" role="listbox">
+                                <div class="carousel-item active">
+                                    <div class="row">
+                                        <div class="col-3 p-md-5" th:if="${brand1 != null}">
+                                            <a href="#"><img class="img-fluid brand-img" th:src="@{/image/{id}(id=${brand1.id})}" alt="Brand Logo"></a>
+                                        </div>
+                                        <div class="col-3 p-md-5" th:if="${brand2 != null}">
+                                            <a href="#"><img class="img-fluid brand-img" th:src="@{/image/{id}(id=${brand2.id})}" alt="Brand Logo"></a>
+                                        </div>
+                                        <div class="col-3 p-md-5" th:if="${brand3 != null}">
+                                            <a href="#"><img class="img-fluid brand-img" th:src="@{/image/{id}(id=${brand3.id})}" alt="Brand Logo"></a>
+                                        </div>
+                                        <div class="col-3 p-md-5" th:if="${brand4 != null}">
+                                            <a href="#"><img class="img-fluid brand-img" th:src="@{/image/{id}(id=${brand4.id})}" alt="Brand Logo"></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-1 align-self-center">
+                        <a class="h1" href="#multi-item-example" role="button" data-bs-slide="next">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h5>NOVA eCommerce</h5>
+                <p>Your premium destination for quality products and exceptional shopping experiences. Discover innovation, style, and excellence in every purchase.</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a th:href="@{/}">Home</a></li>
+                    <li class="mb-2"><a th:href="@{/shop}">Shop</a></li>
+                    <li class="mb-2"><a th:href="@{/about}">About Us</a></li>
+                    <li class="mb-2"><a th:href="@{/contact}">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h5>Categories</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2" th:each="category : ${categories}">
+                        <a th:href="@{/shop(categoryId=${category.id})}" th:text="${category.name}">Category</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h5>Account</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2" sec:authorize="!isAuthenticated()"><a th:href="@{/login}">Login</a></li>
+                    <li class="mb-2" sec:authorize="!isAuthenticated()"><a th:href="@{/register}">Register</a></li>
+                    <li class="mb-2" sec:authorize="isAuthenticated()"><a th:href="@{/cart}">My Cart</a></li>
+                    <li class="mb-2" sec:authorize="isAuthenticated()"><a th:href="@{/profile}">My Profile</a></li>
+                    <li class="mb-2" sec:authorize="isAuthenticated()"><a th:href="@{/logout}">Logout</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h5>Support</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#">Help Center</a></li>
+                    <li class="mb-2"><a href="#">Shipping Info</a></li>
+                    <li class="mb-2"><a href="#">Returns</a></li>
+                    <li class="mb-2"><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 NOVA eCommerce. All rights reserved. | Designed with excellence in mind.</p>
+        </div>
+    </div>
+</footer>
+
+<script type="application/javascript" th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+<script type="application/javascript" th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
+</script>
+</body>
+</html>

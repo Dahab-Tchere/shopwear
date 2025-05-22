@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Shopwear - Add Product</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --success-gradient: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+      --warning-gradient: linear-gradient(135deg, #ffb347 0%, #ffcc33 100%);
+      --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+      --info-gradient: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+      --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      --hover-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      min-height: 100vh;
+    }
+
+    .content-wrapper {
+      padding: 2.5rem;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .page-header {
+      background: white;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255,255,255,0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--primary-gradient);
+    }
+
+    .page-header h1 {
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+      margin: 0;
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .page-header .breadcrumb-nav {
+      margin-top: 1rem;
+      color: #6c757d;
+      font-weight: 500;
+    }
+
+    .page-header .breadcrumb-nav a {
+      color: #667eea;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .page-header .breadcrumb-nav a:hover {
+      color: #764ba2;
+    }
+
+    .alert {
+      border-radius: 15px;
+      border: none;
+      padding: 1.2rem 1.8rem;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+      animation: slideDown 0.5s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .alert::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: rgba(255,255,255,0.8);
+    }
+
+    .alert-success {
+      background: var(--success-gradient);
+      color: white;
+      box-shadow: 0 8px 25px rgba(0, 176, 155, 0.3);
+    }
+
+    .alert-danger {
+      background: var(--danger-gradient);
+      color: white;
+      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+    }
+
+    .alert-warning {
+      background: var(--warning-gradient);
+      color: white;
+      box-shadow: 0 8px 25px rgba(255, 179, 71, 0.3);
+    }
+
+    .card {
+      border: none;
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
+      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.8);
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--hover-shadow);
+    }
+
+    .card-header {
+      background: var(--primary-gradient);
+      color: white;
+      border-radius: 20px 20px 0 0 !important;
+      padding: 2rem;
+      border: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .card-header h6 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 1.3rem;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .card-body {
+      padding: 2.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 0.75rem;
+      display: block;
+      font-size: 0.95rem;
+      letter-spacing: 0.3px;
+    }
+
+    .form-control, .form-select {
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      font-size: 0.95rem;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      position: relative;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+      background: white;
+      transform: translateY(-2px);
+    }
+
+    .form-control::placeholder {
+      color: #adb5bd;
+      font-weight: 400;
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .input-group {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #adb5bd;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .form-control.has-icon {
+      padding-left: 3rem;
+    }
+
+    .file-upload-wrapper {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .file-upload-input {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-upload-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 2rem;
+      border: 2px dashed #e9ecef;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.5);
+      color: #6c757d;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .file-upload-label:hover {
+      border-color: #667eea;
+      background: rgba(102, 126, 234, 0.05);
+      color: #667eea;
+    }
+
+    .file-upload-label i {
+      font-size: 2rem;
+    }
+
+    .selected-file {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: rgba(102, 126, 234, 0.1);
+      border-radius: 8px;
+      color: #667eea;
+      font-weight: 500;
+      display: none;
+    }
+
+    .btn {
+      border-radius: 12px;
+      font-weight: 600;
+      padding: 0.75rem 2rem;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      border: none;
+      position: relative;
+      overflow: hidden;
+      font-size: 0.95rem;
+      letter-spacing: 0.3px;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255,255,255,0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
+    .btn-primary {
+      background: var(--primary-gradient);
+      border: none;
+      min-width: 150px;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+      border: none;
+      min-width: 150px;
+    }
+
+    .btn-submit-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .form-section {
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 15px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+
+    .form-section-title {
+      color: #495057;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .form-section-title i {
+      color: #667eea;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .form-row.single {
+      grid-template-columns: 1fr;
+    }
+
+    .star-rating {
+      display: flex;
+      gap: 0.25rem;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+
+    .star {
+      color: #ffc107;
+      font-size: 1.2rem;
+    }
+
+    .text-danger {
+      color: #dc3545;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .content-wrapper {
+        padding: 1.5rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .btn-submit-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn-submit-group .btn {
+        width: 100%;
+        margin: 0.25rem 0;
+      }
+    }
+  </style>
+</head>
+<body>
+<div th:replace="~{fragments/admin-layout}">
+  <div th:fragment="content" class="content-wrapper">
+    <div class="page-header">
+      <h1>
+        <i class="fas fa-plus-circle"></i>
+        Add New Product
+      </h1>
+      <div class="breadcrumb-nav">
+        <a href="/admin/dashboard">Dashboard</a> / <a href="/admin/products">Products</a> / Add Product
+      </div>
+    </div>
+
+    <!-- Display success or error messages -->
+    <div th:if="${success}" class="alert alert-success" role="alert">
+      <i class="fas fa-check-circle me-2"></i>
+      <span th:text="${success}"></span>
+    </div>
+    <div th:if="${error}" class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-circle me-2"></i>
+      <span th:text="${error}"></span>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-xl-10 col-lg-12">
+        <div class="card shadow mb-4">
+          <div class="card-header">
+            <h6>
+              <i class="fas fa-info-circle"></i>
+              Product Information
+            </h6>
+          </div>
+          <div class="card-body">
+            <form th:action="@{/admin/products/add}" th:object="${product}" method="post" enctype="multipart/form-data">
+
+              <!-- Basic Information Section -->
+              <div class="form-section">
+                <div class="form-section-title">
+                  <i class="fas fa-tag"></i>
+                  Basic Information
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="name">
+                      <i class="fas fa-box me-2"></i>Product Name
+                    </label>
+                    <input type="text" class="form-control" id="name" th:field="*{name}" placeholder="Enter product name" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="brand">
+                      <i class="fas fa-certificate me-2"></i>Brand
+                    </label>
+                    <input type="text" class="form-control" id="brand" th:field="*{brand}" placeholder="Enter brand name" required>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="imageFile">
+                    <i class="fas fa-image me-2"></i>Product Image
+                  </label>
+                  <div class="file-upload-wrapper">
+                    <input type="file" class="file-upload-input" id="imageFile" name="imageFile" accept="image/*" required>
+                    <label for="imageFile" class="file-upload-label">
+                      <i class="fas fa-cloud-upload-alt"></i>
+                      <div>
+                        <div>Click to upload image</div>
+                        <small>PNG, JPG, GIF up to 10MB</small>
+                      </div>
+                    </label>
+                    <div class="selected-file" id="selectedFile"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Category and Pricing Section -->
+              <div class="form-section">
+                <div class="form-section-title">
+                  <i class="fas fa-dollar-sign"></i>
+                  Category & Pricing
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="category">
+                      <i class="fas fa-folder me-2"></i>Category
+                    </label>
+                    <div th:unless="${#lists.isEmpty(categories)}">
+                      <select class="form-control" id="category" th:field="*{category}" required>
+                        <option value="" disabled selected>Select a category</option>
+                        <option th:each="category : ${categories}"
+                                th:value="${category.id}"
+                                th:text="${category.name}">Category Name</option>
+                      </select>
+                    </div>
+                    <div th:if="${#lists.isEmpty(categories)}" class="alert alert-warning" role="alert">
+                      <i class="fas fa-exclamation-triangle me-2"></i>
+                      No categories available. Please add categories first.
+                    </div>
+                    <div th:if="${#fields.hasErrors('category')}" class="text-danger" th:errors="*{category}">Category Error</div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="price">
+                      <i class="fas fa-tag me-2"></i>Price ($)
+                    </label>
+                    <input type="number" step="0.01" class="form-control" id="price" th:field="*{price}" placeholder="0.00" required>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="rating">
+                    <i class="fas fa-star me-2"></i>Rating (0 to 5)
+                  </label>
+                  <input type="number" step="0.1" min="0" max="5" class="form-control" id="rating" th:field="*{rating}" placeholder="4.5" required>
+                  <div class="star-rating" id="starRating">
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Product Details Section -->
+              <div class="form-section">
+                <div class="form-section-title">
+                  <i class="fas fa-list-alt"></i>
+                  Product Details
+                </div>
+
+                <div class="form-group">
+                  <label for="description">
+                    <i class="fas fa-align-left me-2"></i>Description
+                  </label>
+                  <textarea class="form-control" id="description" th:field="*{description}" placeholder="Enter detailed product description" required></textarea>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="sizes">
+                      <i class="fas fa-ruler me-2"></i>Available Sizes
+                    </label>
+                    <input type="text" class="form-control" id="sizes" th:field="*{sizes}" placeholder="S, M, L, XL" required>
+                    <small class="text-muted">Separate multiple sizes with commas</small>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="colors">
+                      <i class="fas fa-palette me-2"></i>Available Colors
+                    </label>
+                    <input type="text" class="form-control" id="colors" th:field="*{colors}" placeholder="Red, Blue, Green" required>
+                    <small class="text-muted">Separate multiple colors with commas</small>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="specifications">
+                    <i class="fas fa-cogs me-2"></i>Specifications
+                  </label>
+                  <input type="text" class="form-control" id="specifications" th:field="*{specifications}" placeholder="Cotton, Machine Washable, Imported" required>
+                  <small class="text-muted">Separate multiple specifications with commas</small>
+                </div>
+              </div>
+
+              <div class="btn-submit-group">
+                <a th:href="@{/admin/products}" class="btn btn-secondary">
+                  <i class="fas fa-arrow-left me-2"></i>
+                  Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-plus-circle me-2"></i>
+                  Add Product
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+  // File upload handler
+  document.getElementById('imageFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const selectedFileDiv = document.getElementById('selectedFile');
+
+    if (file) {
+      selectedFileDiv.innerHTML = `
+        <i class="fas fa-file-image me-2"></i>
+        Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)
+      `;
+      selectedFileDiv.style.display = 'block';
+    } else {
+      selectedFileDiv.style.display = 'none';
+    }
+  });
+
+  // Rating stars update
+  document.getElementById('rating').addEventListener('input', function(e) {
+    const rating = parseFloat(e.target.value) || 0;
+    const stars = document.querySelectorAll('.star');
+
+    stars.forEach((star, index) => {
+      if (index < Math.floor(rating)) {
+        star.className = 'fas fa-star star';
+      } else if (index < rating) {
+        star.className = 'fas fa-star-half-alt star';
+      } else {
+        star.className = 'far fa-star star';
+      }
+    });
+  });
+
+  // Form validation and enhancement
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const inputs = form.querySelectorAll('input, select, textarea');
+
+    // Add floating label effect
+    inputs.forEach(input => {
+      if (input.type !== 'file') {
+        input.addEventListener('focus', function() {
+          this.parentNode.classList.add('focused');
+        });
+
+        input.addEventListener('blur', function() {
+          if (!this.value) {
+            this.parentNode.classList.remove('focused');
+          }
+        });
+
+        // Check if input has value on page load
+        if (input.value) {
+          input.parentNode.classList.add('focused');
+        }
+      }
+    });
+
+    // Animate form sections on scroll
+    const sections = document.querySelectorAll('.form-section');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    });
+
+    sections.forEach((section, index) => {
+      section.style.opacity = '0';
+      section.style.transform = 'translateY(30px)';
+      section.style.transition = `all 0.6s ease-out ${index * 0.1}s`;
+      observer.observe(section);
+    });
+
+    // Auto-resize textarea
+    const textarea = document.getElementById('description');
+    textarea.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = this.scrollHeight + 'px';
+    });
+  });
+
+  // Add smooth scrolling for form validation errors
+  function scrollToError() {
+    const firstError = document.querySelector('.text-danger');
+    if (firstError) {
+      firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  // Form submission enhancement
+  document.querySelector('form').addEventListener('submit', function(e) {
+    const submitBtn = document.querySelector('button[type="submit"]');
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding Product...';
+    submitBtn.disabled = true;
+  });
+</script>
+</body>
+</html>

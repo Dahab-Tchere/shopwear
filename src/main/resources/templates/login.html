@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <title>NOVA - Login</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon" th:href="@{/image/{id}(id=${logoImage.id})}">
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/image/{id}(id=${faviconImage.id})}">
+  <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}">
+  <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/6.0.0/css/all.min.css}">
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap">
+  <style>
+    :root {
+        --primary-color: #4A00E0; /* Deep indigo */
+        --secondary-color: #8E2DE2; /* Vibrant purple */
+        --text-color: #FFFFFF; /* White text */
+        --background-color: #F0F2F5; /* Light gray background */
+    }
+
+    body {
+        font-family: 'Montserrat', sans-serif;
+        color: var(--text-color);
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        background-size: 200% 200%;
+        animation: gradientAnimation 10s ease infinite;
+    }
+
+    @keyframes gradientAnimation {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Header with Sidebar Toggle */
+    header {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 1rem;
+        z-index: 1000;
+    }
+
+    .sidebar-toggle {
+        background: none;
+        border: none;
+        color: var(--text-color);
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    /* Sidebar */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -250px;
+        width: 250px;
+        height: 100%;
+        background: var(--secondary-color);
+        padding: 2rem;
+        transition: left 0.3s ease;
+        z-index: 1001;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    .sidebar .nav-link {
+        color: var(--text-color);
+        font-size: 1.1rem;
+        padding: 0.75rem 0;
+        display: block;
+        transition: color 0.3s ease;
+    }
+
+    .sidebar .nav-link:hover {
+        color: #FFFFFF;
+        text-decoration: underline;
+    }
+
+    .sidebar .close-btn {
+        background: none;
+        border: none;
+        color: var(--text-color);
+        font-size: 1.5rem;
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        cursor: pointer;
+    }
+
+    /* Overlay for Sidebar */
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        z-index: 1000;
+    }
+
+    .overlay.active {
+        display: block;
+    }
+
+    /* Login Section */
+    .login-section {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .login-content {
+        background: rgba(0, 0, 0, 0.5);
+        padding: 2rem;
+        border-radius: 1rem;
+        max-width: 500px;
+        width: 100%;
+    }
+
+    .login-content h1 {
+        font-weight: 700;
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-content .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .login-content .form-group label {
+        font-size: 1.1rem;
+        font-weight: 500;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .login-content .form-control {
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        color: var(--primary-color);
+        font-size: 1rem;
+    }
+
+    .login-content .btn {
+        background-color: #FFFFFF;
+        color: var(--primary-color);
+        font-weight: 500;
+        font-size: 1.2rem;
+        padding: 0.75rem 2rem;
+        border-radius: 2rem;
+        text-transform: uppercase;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+    }
+
+    .login-content .btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .login-content .alert {
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .login-content a {
+        color: #FFFFFF;
+        text-decoration: underline;
+        font-weight: 500;
+    }
+
+    .login-content a:hover {
+        color: #E0E0E0;
+    }
+
+    /* Footer */
+    footer {
+        background-color: var(--secondary-color);
+        padding: 1rem;
+        text-align: center;
+        color: #FFFFFF;
+        font-size: 0.9rem;
+    }
+
+    footer a {
+        color: #FFFFFF;
+        text-decoration: none;
+        margin: 0 0.5rem;
+    }
+
+    footer a:hover {
+        text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<!-- Header with Sidebar Toggle -->
+<header>
+  <button class="sidebar-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+</header>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <button class="close-btn" onclick="toggleSidebar()">
+    <i class="fas fa-times"></i>
+  </button>
+  <nav>
+    <a class="nav-link" th:href="@{/}">Home</a>
+    <a class="nav-link" th:href="@{/shop}">Shop</a>
+    <a class="nav-link" th:href="@{/shop/categories}">Categories</a>
+    <a class="nav-link" th:href="@{/shop/products}">Products</a>
+    <a class="nav-link" th:href="@{/about}">About</a>
+    <a class="nav-link" th:href="@{/contact}">Contact</a>
+    <a sec:authorize="isAuthenticated()" class="nav-link" th:href="@{/cart}">Cart</a>
+    <a sec:authorize="isAuthenticated()" class="nav-link" th:href="@{/logout}">Logout</a>
+    <a sec:authorize="!isAuthenticated()" class="nav-link" th:href="@{/login}">Login</a>
+  </nav>
+</div>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<!-- Login Section -->
+<section class="login-section">
+  <div class="login-content">
+    <h1>Login to NOVA</h1>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${param.error}" class="alert alert-danger">
+      Invalid username or password.
+    </div>
+    <div th:if="${param.logout}" class="alert alert-success">
+      You have been logged out.
+    </div>
+    <div th:if="${param.accessDenied}" class="alert alert-warning">
+      Access denied. Please log in with appropriate credentials.
+    </div>
+    <div th:if="${param.cartAccess}" class="alert alert-info">
+      Please log in to access your cart.
+    </div>
+    <form th:action="@{/login}" method="post">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" class="form-control" required />
+      </div>
+      <div class="text-end">
+        <button type="submit" class="btn">Login</button>
+      </div>
+    </form>
+    <p class="mt-3 text-center">
+      Don't have an account? <a th:href="@{/user/register}">Register here</a>.
+    </p>
+  </div>
+</section>
+
+<!-- Footer -->
+<div th:replace="~{fragments :: footer}"></div>
+
+<!-- Scripts -->
+<script type="application/javascript" th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+<script type="application/javascript" th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
+<script>
+  function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+  }
+</script>
+</body>
+</html>

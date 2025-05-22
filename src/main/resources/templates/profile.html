@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <title>Zay Shop - Profile</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon" th:href="@{/image/${logoImage.id}}">
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/image/${faviconImage.id}}">
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/webjars/font-awesome/6.0.0/css/all.min.css}">
+  <link rel="stylesheet" th:href="@{/static/css/templatemo.css}">
+  <link rel="stylesheet" th:href="@{/static/css/custom.css}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;700;900&display=swap">
+</head>
+<body>
+<div th:replace="~{fragments :: topNav}"></div>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: searchModal}"></div>
+
+<section class="bg-light py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <h1 class="h2 pb-4">My Profile</h1>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div class="row">
+          <div class="col-lg-6">
+            <h3>Update Profile</h3>
+            <form th:action="@{/user/profile}" th:object="${user}" method="post">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <div class="mb-3">
+                <label for="fullName" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="fullName" th:field="*{fullName}">
+                <div th:errors="*{fullName}" class="text-danger"></div>
+              </div>
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" th:field="*{email}">
+                <div th:errors="*{email}" class="text-danger"></div>
+              </div>
+              <button type="submit" class="btn btn-success">Update Profile</button>
+            </form>
+          </div>
+          <div class="col-lg-6">
+            <h3>My Orders</h3>
+            <div th:if="${orders.isEmpty()}">
+              <p class="text-muted">You have no orders yet.</p>
+            </div>
+            <div th:unless="${orders.isEmpty()}" class="table-responsive">
+              <table class="table table-bordered">
+                <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Date</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${orders}">
+                  <td th:text="${order.id}"></td>
+                  <td th:text="${#temporals.format(order.orderDate, 'dd MMM yyyy HH:mm')}"></td>
+                  <td th:text="'$' + ${order.totalPrice}"></td>
+                  <td th:text="${order.status}"></td>
+                  <td>
+                    <a th:href="@{/order-confirmation(orderId=${order.id})}" class="btn btn-sm btn-info">View</a>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div th:replace="~{fragments :: footer}"></div>
+<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/static/js/templatemo.js}"></script>
+<script th:src="@{/static/js/custom.js}"></script>
+</body>
+</html>
