@@ -50,7 +50,7 @@ git push heroku main
 5. Open app:
 heroku open
 Live Demo
-(https://shopwear-tchere-1c9383c6ca01.herokuapp.com)API Endpoints
+[ https://shopwear-tchere-1c9383c6ca01.herokuapp.com ]API Endpoints
 POST /insert
 Inserts a sample document:
 {
